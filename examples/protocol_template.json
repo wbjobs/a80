@@ -1,0 +1,59 @@
+{
+  "name": "简单协议JSON模板",
+  "endian": "little",
+  "fields": [
+    {
+      "field_type": "scalar",
+      "name": "magic",
+      "data_type": "u32"
+    },
+    {
+      "field_type": "scalar",
+      "name": "version",
+      "data_type": "u16"
+    },
+    {
+      "field_type": "scalar",
+      "name": "data_len",
+      "data_type": "u32"
+    },
+    {
+      "field_type": "conditional",
+      "conditions": [
+        {
+          "when": {
+            "field": "version",
+            "eq": 1
+          },
+          "fields": [
+            {
+              "field_type": "scalar",
+              "name": "payload_v1",
+              "data_type": "string",
+              "length_field": "data_len"
+            }
+          ]
+        },
+        {
+          "when": {
+            "field": "version",
+            "in": [2, 3]
+          },
+          "fields": [
+            {
+              "field_type": "scalar",
+              "name": "flags",
+              "data_type": "u8"
+            },
+            {
+              "field_type": "scalar",
+              "name": "payload_v2",
+              "data_type": "bytes",
+              "length_field": "data_len"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
