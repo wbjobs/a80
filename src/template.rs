@@ -88,7 +88,16 @@ pub struct ProtocolTemplate {
     pub name: Option<String>,
     #[serde(default)]
     pub endian: Endian,
+    #[serde(default)]
+    pub signature: Option<TemplateSignature>,
     pub fields: Vec<Field>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TemplateSignature {
+    #[serde(default)]
+    pub offset: usize,
+    pub bytes: String,
 }
 
 impl ProtocolTemplate {

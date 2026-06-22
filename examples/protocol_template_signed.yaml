@@ -1,0 +1,93 @@
+name: "带签名的示例协议"
+endian: big
+
+signature:
+  offset: 2
+  bytes: "00000001"
+
+fields:
+  - field_type: scalar
+    name: length
+    data_type: u16
+
+  - field_type: scalar
+    name: msg_type
+    data_type: u32
+
+  - field_type: conditional
+    conditions:
+      - when:
+          field: msg_type
+          eq: 1
+        fields:
+          - field_type: scalar
+            name: request_id
+            data_type: u32
+          - field_type: scalar
+            name: method_len
+            data_type: u8
+          - field_type: scalar
+            name: method
+            data_type: string
+            length_field: method_len
+      - when:
+          field: msg_type
+          eq: 2
+        fields:
+          - field_type: scalar
+            name: response_id
+            data_type: u32
+          - field_type: scalar
+            name: status_code
+            data_type: u16
+          - field_type: scalar
+            name: body_len
+            data_type: u32
+          - field_type: scalar
+            name: body
+            data_type: bytes
+            length_field: body_len
+      - when:
+          field: msg_type
+          in: [3, 4]
+        fields:
+          - field_type: scalar
+            name: item_count
+            data_type: u16
+          - field_type: array
+            name: items
+            count_field: item_count
+            element:
+              field_type: struct
+              fields:
+                - field_type: scalar
+                  name: id
+                  data_type: u32
+                - field_type: scalar
+                  name: name_len
+                  data_type: u8
+                - field_type: scalar
+                  name: name
+                  data_type: string
+                  length_field: name_len
+    default:
+      - field_type: scalar
+        name: raw_payload
+        data_type: bytes
+
+  - field_type: array
+    name: tags
+    until_eof: true
+    element:
+      field_type: struct
+      fields:
+        - field_type: scalar
+          name: tag_type
+          data_type: u8
+        - field_type: scalar
+          name: tag_len
+          data_type: u16
+        - field_type: scalar
+          name: tag_value
+          data_type: bytes
+          length_field: tag_len
